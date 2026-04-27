@@ -1,0 +1,78 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <sys/types.h>
+
+void asec(int arr[],int n){
+    for (int i=0;i<n-1;i++){
+        for (int j=i+1;j<n;j++){
+            if(arr[i]>arr[j]){
+                int tem=arr[i];
+                arr[i]=arr[j];
+                arr[j]=tem;
+            }
+        }
+    }
+}
+
+void desc(int arr[],int n){
+    for (int i=0;i<n-1;i++){
+        for (int j=i+1;j<n;j++){
+            if(arr[i]<arr[j]){
+                int tem=arr[i];
+                arr[i]=arr[j];
+                arr[j]=tem;
+            }
+        }
+    }
+}
+
+void printarr(int arr[],int n){
+    for(int i=0;i<n;i++){
+        printf("%d ",arr[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    int n;
+    printf("ENter no. of elements: ");
+    scanf("%d",&n);
+    int arr[n],arrcopy[n];
+    printf("Enter elements of array :\n");
+    for(int i=0;i<n;i++){
+        scanf("%d",&arr[i]);
+        arrcopy[i]=arr[i];
+    }
+    
+    printf("Original array :");
+    printarr(arr,n);
+    
+    pid_t p=fork();
+    
+    if(p<0){
+        printf("Fork failed.");
+        exit(0);
+    }
+    else if(p==0){
+        printf("[CHILD] PID=%d PPID=%d",getpid(),getppid());
+        printf("\n[CHILD] Child sorting in asecnding order:");
+        asec(arrcopy,n);
+        printf("\n[CHILD] Child sorted array :");
+        printarr(arrcopy,n);
+        printf("\n[CHILD] Child finish and exit.");
+        exit(0);
+    }
+    else{
+        printf("[PARENT] PID=%d PPID=%d Child PID=%d",getpid(),getppid(),p);
+        printf("\n[PARENT] Parent sorting in descending order:");
+        desc(arr,n);
+        printf("\n[PARENT] Parent sorted array :");
+        printarr(arr,n);
+        printf("[PARENT] Parent waiting for child to finish...");
+        wait(NULL);
+        printf("\n[PARENT] Parent finish.");
+    }
+    return 0;
+}

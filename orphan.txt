@@ -1,0 +1,28 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main() {
+    pid_t p = fork();
+
+    if (p < 0) {
+        perror("Fork failed");
+        exit(1);
+    }
+
+    if (p > 0) {
+        printf("[PARENT] PID=%d - Exiting now!\n", getpid());
+        exit(0); 
+    } else {
+     
+        printf("[CHILD]  PID=%d, Initial PPID=%d\n", getpid(), getppid());
+        
+        printf("[CHILD]  Sleeping for 3 seconds to become an orphan...\n");
+        sleep(3); 
+        
+        // Displaying PID and the NEW PPID after adoption
+        printf("[CHILD]  After sleep: My PID=%d, My NEW PPID=%d (Adopted!)\n", 
+               getpid(), getppid());
+    }
+    return 0;
+}
